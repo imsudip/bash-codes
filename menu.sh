@@ -4,18 +4,28 @@
 fetch_program() {
     folder="$1"
     echo "Available programs in $folder folder:"
-    ls "$folder"
+    ls "$folder" | grep -oE 'q_[0-9]+\.sh' | cut -d'_' -f2 | cut -d'.' -f1
     echo
-    read -p "Enter the name of the program you want to fetch: " program
-    cp "$folder/$program" .
-    chmod +x "$program"
-    echo "Program $program fetched successfully."
+    read -p "Enter the question number of the program you want to fetch: " question_number
+    program="q_${question_number}.sh"
+    if [[ -f "$folder/$program" ]]; then
+        cp "$folder/$program" .
+        chmod +x "$program"
+        echo "Program $program fetched successfully."
+        run_program "$program"
+        rm "$program"
+    else
+        echo "Program $program not found."
+    fi
     echo
+    
 }
+
+
 
 # Function to run a program
 run_program() {
-    read -p "Enter the name of the program you want to run: " program
+    program="$1"
     if [[ -x "$program" ]]; then
         ./"$program"
     else
